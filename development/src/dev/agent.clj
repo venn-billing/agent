@@ -4,6 +4,7 @@
     [clojure.java.io :as io]
     [clojure.tools.namespace.repl :as repl]
     [com.vennbilling.agent.core]
+    [com.vennbilling.system.interface]
     [integrant.core :as ig]
     [integrant.repl :refer [prep go halt reset init]]
     [integrant.repl.state]
@@ -11,13 +12,11 @@
 
 
 (def config-file (io/resource "../../../bases/agent/resources/agent/system.edn"))
-(def config (read-config config-file {:profile :dev}))
 
-(integrant.repl/set-prep! #(ig/prep config))
+(integrant.repl/set-prep! #(ig/prep (read-config config-file {:profile :dev})))
 (repl/set-refresh-dirs "../../../bases/agent/src")
 
 (System/setProperty "logback.statusListenerClass" "ch.qos.logback.core.status.OnConsoleStatusListener")
-
 
 (log/debug :msg "agent running in development mode")
 

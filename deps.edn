@@ -17,6 +17,7 @@
            :dev {:extra-deps {poly/spec {:local/root "components/spec"}
                               poly/healthcheck {:local/root "components/healthcheck"}
                               poly/customer {:local/root "components/customer"}
+                              poly/system {:local/root "components/system"}
                               poly/agent {:local/root "bases/agent"}
 
                               integrant/repl {:mvn/version "0.3.3"}

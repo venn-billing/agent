@@ -1,0 +1,3 @@
+{:system/env
+ #profile {:dev :dev
+           :prod :prod}}

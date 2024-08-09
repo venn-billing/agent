@@ -1,11 +1,11 @@
 (ns com.vennbilling.agent.core
   (:gen-class)
   (:require
-    [aero.core :refer [read-config]]
     [clojure.java.io :as io]
     [com.vennbilling.customer.interface :as customer]
     [com.vennbilling.healthcheck.interface :as healthcheck]
     [com.vennbilling.spec.interface :as venn-spec]
+    [com.vennbilling.system.interface :as system]
     [integrant.core :as ig]
     [io.pedestal.log :as log]
     [muuntaja.core :as m]
@@ -17,19 +17,6 @@
     [reitit.ring.middleware.parameters :as parameters]
     [ring.adapter.undertow :refer [run-undertow]]
     [ring.logger :as logger]))
-
-
-(defmethod aero.core/reader 'ig/ref
-  [_ _ value]
-  (ig/ref value))
-
-
-(defmethod aero.core/reader 'ig/refset
-  [_ _ value]
-  (ig/refset value))
-
-
-(defmethod ig/init-key :system/env [_ env] env)
 
 
 (defmethod ig/init-key :server/http
@@ -112,36 +99,12 @@
   (ring/router ["" opts routes]))
 
 
-(defonce system (atom nil))
 (def ^:const banner (slurp (io/resource "agent/banner.txt")))
-
-
-(defn- config
-  [opts]
-  (read-config (io/resource "agent/system.edn") opts))
-
-
-(defn stop-app
-  []
-  (log/info :msg "venn agent has shut down successfully")
-  (some-> (deref system) (ig/halt!)))
-
-
-(defn start-app
-  [{:keys [profile] :as opts}]
-
-  (System/setProperty "org.jboss.logging.provider" "slf4j")
-
-  (println "\n" banner)
-  (log/info :msg "venn agent started successfully." :profile profile)
-
-  (->> (config opts)
-       (ig/prep)
-       (ig/init)
-       (reset! system))
-  (.addShutdownHook (Runtime/getRuntime) (Thread. stop-app)))
+(def config-file (io/resource "agent/system.edn"))
 
 
 (defn -main
   [& _]
-  (start-app {:profile :prod}))
+  ;; TODO: Pass profile as args
+  (system/start banner config-file {:profile :prod})
+  (log/info :msg "venn agent started successfully."))
