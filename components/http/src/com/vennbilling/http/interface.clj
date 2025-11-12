@@ -1,5 +1,6 @@
 (ns com.vennbilling.http.interface
-  (:require [com.vennbilling.http.ring :as ring]
+  (:require [com.vennbilling.http.core :as core]
+            [com.vennbilling.http.ring :as ring]
             [com.vennbilling.http.routes :as routes]
             [com.vennbilling.http.undertow :as undertow]))
 
@@ -9,6 +10,12 @@
 
 (def server-routes
   [routes/customers])
+
+(defmacro defhandler
+  "Defines a handler function that automatically applies respond-with to the result.
+   See com.vennbilling.http.core/defhandler for implementation details."
+  [name args & body]
+  `(core/defhandler ~name ~args ~@body))
 
 (defn serve
   "Starts up an HTTP server with a io.undertow config and ring handler. Returns an undertow server"
